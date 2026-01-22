@@ -38,6 +38,10 @@ func New(httpClient *http.Client, r runner.Runner, progress types.ProgressReport
 
 // Available checks if snapd is available by querying /v2/system-info.
 func (b *Backend) Available(ctx context.Context) (bool, error) {
+	if b.runner == nil {
+		return false, &types.NotAvailableError{Backend: "snap", Reason: "no runner configured"}
+	}
+
 	// Query the snapd API via Unix socket
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "http://localhost/v2/system-info", nil)
 	if err != nil {
