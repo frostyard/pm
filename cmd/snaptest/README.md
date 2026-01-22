@@ -74,7 +74,7 @@ Example: `./bin/snaptest uninstall firefox`
 
 ## Example Output
 
-```
+```text
 $ ./bin/snaptest capabilities
 Backend Capabilities:
   ✓ Search (via snap find CLI)

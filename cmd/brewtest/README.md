@@ -74,7 +74,7 @@ Example: `./bin/brewtest uninstall wget`
 
 ## Example Output
 
-```
+```text
 $ ./bin/brewtest capabilities
 Backend Capabilities:
   ✓ Search (via Formulae API)

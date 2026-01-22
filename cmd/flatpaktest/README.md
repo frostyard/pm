@@ -74,7 +74,7 @@ Example: `./bin/flatpaktest uninstall org.mozilla.firefox`
 
 ## Example Output
 
-```
+```text
 $ ./bin/flatpaktest capabilities
 Backend Capabilities:
   ✓ Search (via flatpak search CLI)
