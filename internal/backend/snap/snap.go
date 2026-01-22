@@ -2,6 +2,7 @@ package snap
 
 import (
 	"context"
+	"net"
 	"net/http"
 	"strings"
 
@@ -19,7 +20,14 @@ type Backend struct {
 // New creates a new snap backend.
 func New(httpClient *http.Client, r runner.Runner, progress types.ProgressReporter) *Backend {
 	if httpClient == nil {
-		httpClient = http.DefaultClient
+		// Create an HTTP client that connects to the snapd Unix socket
+		httpClient = &http.Client{
+			Transport: &http.Transport{
+				DialContext: func(ctx context.Context, _, _ string) (net.Conn, error) {
+					return (&net.Dialer{}).DialContext(ctx, "unix", "/run/snapd.socket")
+				},
+			},
+		}
 	}
 	return &Backend{
 		httpClient: httpClient,
@@ -30,9 +38,7 @@ func New(httpClient *http.Client, r runner.Runner, progress types.ProgressReport
 
 // Available checks if snapd is available by querying /v2/system-info.
 func (b *Backend) Available(ctx context.Context) (bool, error) {
-	// Try to reach the snapd API
-	// Note: In production, this would use a unix socket transport
-	// For now, we test if the http client is functional
+	// Query the snapd API via Unix socket
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "http://localhost/v2/system-info", nil)
 	if err != nil {
 		return false, &types.NotAvailableError{Backend: "snap", Reason: "failed to create request: " + err.Error()}

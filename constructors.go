@@ -327,7 +327,7 @@ func NewFlatpak(opts ...ConstructorOption) Manager {
 	}
 
 	return &backendAdapter{
-		backend: flatpak.New(nil, convertProgressReporter(cfg.progress)),
+		backend: flatpak.New(runner.NewRealRunner(), convertProgressReporter(cfg.progress)),
 	}
 }
 

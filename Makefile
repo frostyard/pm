@@ -72,6 +72,21 @@ test: ensure-go ensure-mod ## Run unit tests
 build: ensure-go ensure-mod ## Compile all packages (no tests)
 	$(GO) test -run=^$ ./...
 
+.PHONY: build-brewtest
+build-brewtest: ensure-go ensure-mod ## Build the brewtest CLI tool
+	$(GO) build -o bin/brewtest ./cmd/brewtest
+
+.PHONY: build-flatpaktest
+build-flatpaktest: ensure-go ensure-mod ## Build the flatpaktest CLI tool
+	$(GO) build -o bin/flatpaktest ./cmd/flatpaktest
+
+.PHONY: build-snaptest
+build-snaptest: ensure-go ensure-mod ## Build the snaptest CLI tool
+	$(GO) build -o bin/snaptest ./cmd/snaptest
+
+.PHONY: build-cli
+build-cli: build-brewtest build-flatpaktest build-snaptest ## Build all CLI test tools
+
 .PHONY: check
 check: fmt lint test ## Format, lint, and test (main local gate)
 

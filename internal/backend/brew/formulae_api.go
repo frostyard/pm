@@ -14,6 +14,13 @@ const (
 	formulaeAPIBase = "https://formulae.brew.sh/api"
 )
 
+// formulaInfo represents a formula from the Homebrew Formulae API.
+type formulaInfo struct {
+	Name     string `json:"name"`
+	FullName string `json:"full_name"`
+	Desc     string `json:"desc"`
+}
+
 // searchFormulae searches for formulae by name using the API.
 // Returns a list of matching package references.
 func (b *Backend) searchFormulae(ctx context.Context, query string) ([]types.PackageRef, error) {
@@ -48,9 +55,9 @@ func (b *Backend) searchFormulae(ctx context.Context, query string) ([]types.Pac
 		}
 	}
 
-	// The API returns an array of formula names
-	var names []string
-	if err := json.NewDecoder(resp.Body).Decode(&names); err != nil {
+	// The API returns an array of formula objects
+	var formulae []formulaInfo
+	if err := json.NewDecoder(resp.Body).Decode(&formulae); err != nil {
 		return nil, &types.ExternalFailureError{
 			Operation: types.OperationSearch,
 			Backend:   "brew",
@@ -61,10 +68,10 @@ func (b *Backend) searchFormulae(ctx context.Context, query string) ([]types.Pac
 	// Filter formulae by query (case-insensitive substring match)
 	var results []types.PackageRef
 	queryLower := strings.ToLower(query)
-	for _, name := range names {
-		if strings.Contains(strings.ToLower(name), queryLower) {
+	for _, formula := range formulae {
+		if strings.Contains(strings.ToLower(formula.Name), queryLower) {
 			results = append(results, types.PackageRef{
-				Name: name,
+				Name: formula.Name,
 				Kind: "formula",
 			})
 		}
