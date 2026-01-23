@@ -1,4 +1,4 @@
-package types
+package progress
 
 import (
 	"time"
@@ -44,7 +44,7 @@ func (h *ProgressHelper) BeginAction(name string) string {
 	return action.ID
 }
 
-// EndAction ends the current action.
+// EndAction marks the current action as ended.
 func (h *ProgressHelper) EndAction() {
 	if h.reporter == nil || h.currentAction == nil {
 		return
@@ -129,7 +129,7 @@ func (h *ProgressHelper) Info(text string) {
 	h.message(SeverityInfo, text)
 }
 
-// Warning emits a warning message.
+// Warning emits a warning message (does not fail the operation).
 func (h *ProgressHelper) Warning(text string) {
 	h.message(SeverityWarning, text)
 }
@@ -139,15 +139,15 @@ func (h *ProgressHelper) Error(text string) {
 	h.message(SeverityError, text)
 }
 
-// message emits a message with the given severity.
+// message emits a progress message with the specified severity.
 func (h *ProgressHelper) message(severity Severity, text string) {
 	if h.reporter == nil {
 		return
 	}
 
 	msg := ProgressMessage{
-		Text:      text,
 		Severity:  severity,
+		Text:      text,
 		Timestamp: time.Now(),
 	}
 

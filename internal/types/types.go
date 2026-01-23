@@ -5,7 +5,8 @@ package types
 import (
 	"errors"
 	"fmt"
-	"time"
+
+	"github.com/frostyard/pm/progress"
 )
 
 // Core errors that backends can return.
@@ -124,60 +125,42 @@ type Capability struct {
 	Notes     string
 }
 
-// Progress reporter types matching pm package.
+// Progress reporter types from progress module.
+type (
+	// Severity represents the severity level of a progress message.
+	Severity = progress.Severity
 
-// Severity represents the severity level of a progress message.
-type Severity string
+	// ProgressMessage is a message emitted during progress.
+	ProgressMessage = progress.ProgressMessage
 
-const (
-	SeverityInfo    Severity = "Informational"
-	SeverityWarning Severity = "Warning"
-	SeverityError   Severity = "Error"
+	// ProgressAction represents a high-level action in a long-running operation.
+	ProgressAction = progress.ProgressAction
+
+	// ProgressTask represents a task within an action.
+	ProgressTask = progress.ProgressTask
+
+	// ProgressStep represents a step within a task.
+	ProgressStep = progress.ProgressStep
+
+	// ProgressReporter is the interface for progress reporting.
+	ProgressReporter = progress.ProgressReporter
+
+	// ProgressHelper provides a convenient API for backends to emit progress updates.
+	ProgressHelper = progress.ProgressHelper
 )
 
-// ProgressMessage is a message emitted during progress.
-type ProgressMessage struct {
-	Severity  Severity
-	Text      string
-	Timestamp time.Time
-	ActionID  string
-	TaskID    string
-	StepID    string
+// Re-export severity constants
+const (
+	SeverityInfo    = progress.SeverityInfo
+	SeverityWarning = progress.SeverityWarning
+	SeverityError   = progress.SeverityError
+)
+
+// NewProgressHelper creates a new progress helper with progress reporting.
+func NewProgressHelper(defaultReporter, overrideReporter ProgressReporter) *ProgressHelper {
+	return progress.NewProgressHelper(defaultReporter, overrideReporter)
 }
 
-// ProgressAction represents a high-level action in a long-running operation.
-type ProgressAction struct {
-	ID        string
-	Name      string
-	StartedAt time.Time
-	EndedAt   time.Time
-}
-
-// ProgressTask represents a task within an action.
-type ProgressTask struct {
-	ID        string
-	ActionID  string
-	Name      string
-	StartedAt time.Time
-	EndedAt   time.Time
-}
-
-// ProgressStep represents a step within a task.
-type ProgressStep struct {
-	ID        string
-	TaskID    string
-	Name      string
-	StartedAt time.Time
-	EndedAt   time.Time
-}
-
-// ProgressReporter is the interface for progress reporting (internal).
-type ProgressReporter interface {
-	OnAction(action ProgressAction)
-	OnTask(task ProgressTask)
-	OnStep(step ProgressStep)
-	OnMessage(msg ProgressMessage)
-}
 
 // Result types for operations.
 type UpdateResult struct {

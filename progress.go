@@ -1,81 +1,39 @@
 package pm
 
-import "time"
+import "github.com/frostyard/pm/progress"
 
-// Severity represents the severity level of a progress message.
-type Severity string
+// Re-export progress types for backward compatibility
+type (
+	// ProgressReporter is the interface for receiving progress updates.
+	ProgressReporter = progress.ProgressReporter
 
-const (
-	// SeverityInfo represents an informational message.
-	SeverityInfo Severity = "Informational"
+	// ProgressAction represents a high-level action in a long-running operation.
+	ProgressAction = progress.ProgressAction
 
-	// SeverityWarning represents a warning message (does not fail the operation).
-	SeverityWarning Severity = "Warning"
+	// ProgressTask represents a task within an action.
+	ProgressTask = progress.ProgressTask
 
-	// SeverityError represents an error message.
-	SeverityError Severity = "Error"
+	// ProgressStep represents a step within a task.
+	ProgressStep = progress.ProgressStep
+
+	// ProgressMessage is a message emitted during progress.
+	ProgressMessage = progress.ProgressMessage
+
+	// ProgressHelper provides a convenient API for backends to emit progress updates.
+	ProgressHelper = progress.ProgressHelper
+
+	// Severity represents the severity level of a progress message.
+	Severity = progress.Severity
 )
 
-// ProgressMessage is a message emitted during progress.
-type ProgressMessage struct {
-	// Severity is the message severity.
-	Severity Severity
+// Re-export severity constants
+const (
+	SeverityInfo    = progress.SeverityInfo
+	SeverityWarning = progress.SeverityWarning
+	SeverityError   = progress.SeverityError
+)
 
-	// Text is the message text.
-	Text string
-
-	// Timestamp is when the message was created.
-	Timestamp time.Time
-
-	// ActionID is the optional associated action ID.
-	ActionID string
-
-	// TaskID is the optional associated task ID.
-	TaskID string
-
-	// StepID is the optional associated step ID.
-	StepID string
-}
-
-// ProgressAction represents a high-level action in a long-running operation.
-type ProgressAction struct {
-	ID        string
-	Name      string
-	StartedAt time.Time
-	EndedAt   time.Time
-}
-
-// ProgressTask represents a task within an action.
-type ProgressTask struct {
-	ID        string
-	ActionID  string
-	Name      string
-	StartedAt time.Time
-	EndedAt   time.Time
-}
-
-// ProgressStep represents a step within a task.
-type ProgressStep struct {
-	ID        string
-	TaskID    string
-	Name      string
-	StartedAt time.Time
-	EndedAt   time.Time
-}
-
-// ProgressReporter is the interface for receiving progress updates.
-//
-// Implementations MUST be safe for concurrent use.
-type ProgressReporter interface {
-	// OnAction is called when an action starts or ends.
-	OnAction(action ProgressAction)
-
-	// OnTask is called when a task starts or ends.
-	OnTask(task ProgressTask)
-
-	// OnStep is called when a step starts or ends.
-	OnStep(step ProgressStep)
-
-	// OnMessage is called when a message is emitted.
-	OnMessage(msg ProgressMessage)
+// NewProgressHelper creates a new progress helper with progress reporting.
+func NewProgressHelper(defaultReporter, overrideReporter ProgressReporter) *ProgressHelper {
+	return progress.NewProgressHelper(defaultReporter, overrideReporter)
 }
