@@ -125,7 +125,11 @@ func handleList(ctx context.Context, backend pm.Manager) {
 
 	fmt.Printf("Installed packages (%d):\n", len(packages))
 	for _, pkg := range packages {
-		fmt.Printf("  %s %s\n", pkg.Ref.Name, pkg.Version)
+		namespace := pkg.Ref.Namespace
+		if namespace == "" {
+			namespace = "(unknown)"
+		}
+		fmt.Printf("  %-50s %-15s [%s]\n", pkg.Ref.Name, pkg.Version, namespace)
 	}
 }
 

@@ -383,7 +383,7 @@ func (b *Backend) ListInstalled(ctx context.Context, opts types.ListOptions) ([]
 		"flatpak",
 		"list",
 		"--app",
-		"--columns=name,application,version",
+		"--columns=name,application,version,installation",
 	)
 	helper.EndTask()
 
@@ -392,7 +392,7 @@ func (b *Backend) ListInstalled(ctx context.Context, opts types.ListOptions) ([]
 		return nil, err
 	}
 
-	// Parse output: columns are name, application ID, version
+	// Parse output: columns are name, application ID, version, installation
 	var packages []types.InstalledPackage
 	lines := strings.Split(stdout, "\n")
 
@@ -404,7 +404,21 @@ func (b *Backend) ListInstalled(ctx context.Context, opts types.ListOptions) ([]
 
 		// Split by tab (flatpak uses tabs for column separation with --columns)
 		fields := strings.Split(line, "\t")
-		if len(fields) >= 3 {
+		if len(fields) >= 4 {
+			appID := strings.TrimSpace(fields[1])
+			version := strings.TrimSpace(fields[2])
+			installation := strings.TrimSpace(fields[3])
+
+			packages = append(packages, types.InstalledPackage{
+				Ref: types.PackageRef{
+					Name:      appID,
+					Kind:      "app",
+					Namespace: installation, // "user" or "system"
+				},
+				Version: version,
+			})
+		} else if len(fields) >= 3 {
+			// Fallback: if installation column is missing, still parse what we can
 			appID := strings.TrimSpace(fields[1])
 			version := strings.TrimSpace(fields[2])
 
@@ -418,14 +432,19 @@ func (b *Backend) ListInstalled(ctx context.Context, opts types.ListOptions) ([]
 		} else {
 			// Fallback: split by whitespace if tabs not present
 			fields = strings.Fields(line)
-			if len(fields) >= 2 {
-				appID := fields[0]
-				version := fields[1]
+			if len(fields) >= 3 {
+				appID := fields[1]
+				version := fields[2]
+				installation := ""
+				if len(fields) >= 4 {
+					installation = fields[3]
+				}
 
 				packages = append(packages, types.InstalledPackage{
 					Ref: types.PackageRef{
-						Name: appID,
-						Kind: "app",
+						Name:      appID,
+						Kind:      "app",
+						Namespace: installation,
 					},
 					Version: version,
 				})
