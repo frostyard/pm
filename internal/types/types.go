@@ -161,7 +161,6 @@ func NewProgressHelper(defaultReporter, overrideReporter ProgressReporter) *Prog
 	return progress.NewProgressHelper(defaultReporter, overrideReporter)
 }
 
-
 // Result types for operations.
 type UpdateResult struct {
 	Changed  bool

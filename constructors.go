@@ -268,32 +268,15 @@ type progressReporterAdapter struct {
 }
 
 func (a *progressReporterAdapter) OnAction(action types.ProgressAction) {
-	a.pr.OnAction(ProgressAction{
-		ID:        action.ID,
-		Name:      action.Name,
-		StartedAt: action.StartedAt,
-		EndedAt:   action.EndedAt,
-	})
+	a.pr.OnAction(ProgressAction(action))
 }
 
 func (a *progressReporterAdapter) OnTask(task types.ProgressTask) {
-	a.pr.OnTask(ProgressTask{
-		ID:        task.ID,
-		ActionID:  task.ActionID,
-		Name:      task.Name,
-		StartedAt: task.StartedAt,
-		EndedAt:   task.EndedAt,
-	})
+	a.pr.OnTask(ProgressTask(task))
 }
 
 func (a *progressReporterAdapter) OnStep(step types.ProgressStep) {
-	a.pr.OnStep(ProgressStep{
-		ID:        step.ID,
-		TaskID:    step.TaskID,
-		Name:      step.Name,
-		StartedAt: step.StartedAt,
-		EndedAt:   step.EndedAt,
-	})
+	a.pr.OnStep(ProgressStep(step))
 }
 
 func (a *progressReporterAdapter) OnMessage(msg types.ProgressMessage) {
