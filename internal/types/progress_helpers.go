@@ -50,71 +50,77 @@ func (h *ProgressHelper) EndAction() {
 		return
 	}
 
-	action := *h.currentAction
-	action.EndedAt = time.Now()
-	h.reporter.OnAction(action)
+	h.currentAction.EndedAt = time.Now()
+	h.reporter.OnAction(*h.currentAction)
 	h.currentAction = nil
+	h.currentTask = nil
+	h.currentStep = nil
 }
 
-// BeginTask starts a new task and returns its ID.
+// BeginTask starts a new task within the current action and returns its ID.
 func (h *ProgressHelper) BeginTask(name string) string {
 	if h.reporter == nil {
 		return ""
 	}
 
+	actionID := ""
+	if h.currentAction != nil {
+		actionID = h.currentAction.ID
+	}
+
 	task := ProgressTask{
 		ID:        uuid.New().String(),
+		ActionID:  actionID,
 		Name:      name,
 		StartedAt: time.Now(),
-	}
-	if h.currentAction != nil {
-		task.ActionID = h.currentAction.ID
 	}
 	h.currentTask = &task
 	h.reporter.OnTask(task)
 	return task.ID
 }
 
-// EndTask ends the current task.
+// EndTask marks the current task as ended.
 func (h *ProgressHelper) EndTask() {
 	if h.reporter == nil || h.currentTask == nil {
 		return
 	}
 
-	task := *h.currentTask
-	task.EndedAt = time.Now()
-	h.reporter.OnTask(task)
+	h.currentTask.EndedAt = time.Now()
+	h.reporter.OnTask(*h.currentTask)
 	h.currentTask = nil
+	h.currentStep = nil
 }
 
-// BeginStep starts a new step and returns its ID.
+// BeginStep starts a new step within the current task and returns its ID.
 func (h *ProgressHelper) BeginStep(name string) string {
 	if h.reporter == nil {
 		return ""
 	}
 
+	taskID := ""
+	if h.currentTask != nil {
+		taskID = h.currentTask.ID
+	}
+
 	step := ProgressStep{
 		ID:        uuid.New().String(),
+		TaskID:    taskID,
 		Name:      name,
 		StartedAt: time.Now(),
-	}
-	if h.currentTask != nil {
-		step.TaskID = h.currentTask.ID
 	}
 	h.currentStep = &step
 	h.reporter.OnStep(step)
 	return step.ID
 }
 
-// EndStep ends the current step.
+// EndStep marks the current step as ended.
 func (h *ProgressHelper) EndStep() {
 	if h.reporter == nil || h.currentStep == nil {
 		return
 	}
 
-	step := *h.currentStep
-	step.EndedAt = time.Now()
-	h.reporter.OnStep(step)
+	h.currentStep.EndedAt = time.Now()
+	h.reporter.OnStep(*h.currentStep)
 	h.currentStep = nil
 }
 
