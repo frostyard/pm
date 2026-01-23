@@ -43,7 +43,7 @@ func (r *capturingReporter) OnMessage(msg ProgressMessage) {
 func TestProgressHelper_Sequences(t *testing.T) {
 	t.Run("Action -> Task -> Step -> Message sequence", func(t *testing.T) {
 		reporter := &capturingReporter{}
-		helper := NewProgressHelper(reporter)
+		helper := NewProgressHelper(nil, reporter)
 
 		// Begin action
 		actionID := helper.BeginAction("TestAction")
@@ -109,7 +109,7 @@ func TestProgressHelper_Sequences(t *testing.T) {
 
 	t.Run("Multiple tasks in one action", func(t *testing.T) {
 		reporter := &capturingReporter{}
-		helper := NewProgressHelper(reporter)
+		helper := NewProgressHelper(nil, reporter)
 
 		actionID := helper.BeginAction("MultiTaskAction")
 
@@ -141,7 +141,7 @@ func TestProgressHelper_Sequences(t *testing.T) {
 
 	t.Run("Timestamps are set", func(t *testing.T) {
 		reporter := &capturingReporter{}
-		helper := NewProgressHelper(reporter)
+		helper := NewProgressHelper(nil, reporter)
 
 		before := time.Now()
 		helper.BeginAction("TimedAction")
@@ -175,7 +175,7 @@ func TestProgressHelper_Sequences(t *testing.T) {
 // T033: Test that Warning messages do not fail operations
 func TestProgressHelper_WarningsDoNotFail(t *testing.T) {
 	reporter := &capturingReporter{}
-	helper := NewProgressHelper(reporter)
+	helper := NewProgressHelper(nil, reporter)
 
 	helper.BeginAction("ActionWithWarnings")
 	helper.Warning("This is a warning")
@@ -210,7 +210,7 @@ func TestProgressHelper_WarningsDoNotFail(t *testing.T) {
 
 // T034: Test that nil ProgressReporter does not panic
 func TestProgressHelper_NilReporterSafe(t *testing.T) {
-	helper := NewProgressHelper(nil)
+	helper := NewProgressHelper(nil, nil)
 
 	// All these should not panic
 	defer func() {
@@ -260,7 +260,7 @@ func TestProgressHelper_Concurrency(t *testing.T) {
 		go func(id int) {
 			defer wg.Done()
 			// Each goroutine gets its own helper
-			helper := NewProgressHelper(reporter)
+			helper := NewProgressHelper(nil, reporter)
 			helper.BeginAction("ConcurrentAction")
 			helper.BeginTask("Task")
 			for j := 0; j < messagesPerGoroutine; j++ {
@@ -294,7 +294,7 @@ func TestProgressHelper_Concurrency(t *testing.T) {
 
 func TestProgressHelper_MessageSeverities(t *testing.T) {
 	reporter := &capturingReporter{}
-	helper := NewProgressHelper(reporter)
+	helper := NewProgressHelper(nil, reporter)
 
 	helper.BeginAction("SeverityTest")
 	helper.Info("Info message")
@@ -325,7 +325,7 @@ func TestProgressHelper_MessageSeverities(t *testing.T) {
 func TestProgressHelper_OrphanedEvents(t *testing.T) {
 	t.Run("Task without action", func(t *testing.T) {
 		reporter := &capturingReporter{}
-		helper := NewProgressHelper(reporter)
+		helper := NewProgressHelper(nil, reporter)
 
 		// Start a task without an action
 		taskID := helper.BeginTask("OrphanTask")
@@ -347,7 +347,7 @@ func TestProgressHelper_OrphanedEvents(t *testing.T) {
 
 	t.Run("Step without task", func(t *testing.T) {
 		reporter := &capturingReporter{}
-		helper := NewProgressHelper(reporter)
+		helper := NewProgressHelper(nil, reporter)
 
 		helper.BeginAction("Action")
 		stepID := helper.BeginStep("OrphanStep")

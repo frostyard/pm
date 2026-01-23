@@ -15,9 +15,14 @@ type ProgressHelper struct {
 	currentStep   *ProgressStep
 }
 
-// NewProgressHelper creates a new progress helper wrapping the given reporter.
-// If reporter is nil, returns a helper that no-ops all operations.
-func NewProgressHelper(reporter ProgressReporter) *ProgressHelper {
+// NewProgressHelper creates a new progress helper with progress reporting.
+// It uses the override reporter if non-nil, otherwise falls back to the default reporter.
+// If both are nil, returns a helper that no-ops all operations.
+func NewProgressHelper(defaultReporter, overrideReporter ProgressReporter) *ProgressHelper {
+	reporter := overrideReporter
+	if reporter == nil {
+		reporter = defaultReporter
+	}
 	return &ProgressHelper{
 		reporter: reporter,
 	}

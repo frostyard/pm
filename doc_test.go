@@ -116,16 +116,15 @@ func Example_errorHandling() {
 
 // Example_progressReporting demonstrates progress reporting during operations.
 func Example_progressReporting() {
-	backend := pm.NewBrew()
-
-	// Create a progress reporter
+	// Create a progress reporter and set it as the backend's default
 	reporter := &SimpleProgressReporter{}
+	backend := pm.NewBrew(pm.WithProgress(reporter))
 
-	// Search with progress reporting
+	// Operations automatically use the backend's progress reporter
 	_, err := backend.(pm.Searcher).Search(
 		context.Background(),
 		"nodejs",
-		pm.SearchOptions{Progress: reporter},
+		pm.SearchOptions{}, // No need to specify Progress here
 	)
 
 	if err != nil && !pm.IsNotSupported(err) {

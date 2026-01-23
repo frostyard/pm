@@ -69,7 +69,7 @@ func (b *Backend) Update(ctx context.Context, opts types.UpdateOptions) (types.U
 		return types.UpdateResult{}, types.ErrNotSupported
 	}
 
-	helper := types.NewProgressHelper(opts.Progress)
+	helper := types.NewProgressHelper(b.progress, opts.Progress)
 	helper.BeginAction("Update")
 	defer helper.EndAction()
 
@@ -102,7 +102,7 @@ func (b *Backend) Upgrade(ctx context.Context, opts types.UpgradeOptions) (types
 		return types.UpgradeResult{}, types.ErrNotSupported
 	}
 
-	helper := types.NewProgressHelper(opts.Progress)
+	helper := types.NewProgressHelper(b.progress, opts.Progress)
 	helper.BeginAction("Upgrade")
 	defer helper.EndAction()
 
@@ -165,7 +165,7 @@ func (b *Backend) Install(ctx context.Context, pkgs []types.PackageRef, opts typ
 		return types.InstallResult{}, nil
 	}
 
-	helper := types.NewProgressHelper(opts.Progress)
+	helper := types.NewProgressHelper(b.progress, opts.Progress)
 	helper.BeginAction("Install")
 	defer helper.EndAction()
 
@@ -228,7 +228,7 @@ func (b *Backend) Uninstall(ctx context.Context, pkgs []types.PackageRef, opts t
 		return types.UninstallResult{}, nil
 	}
 
-	helper := types.NewProgressHelper(opts.Progress)
+	helper := types.NewProgressHelper(b.progress, opts.Progress)
 	helper.BeginAction("Uninstall")
 	defer helper.EndAction()
 
@@ -283,7 +283,7 @@ func (b *Backend) Uninstall(ctx context.Context, pkgs []types.PackageRef, opts t
 
 // Search implements Searcher using the Formulae API.
 func (b *Backend) Search(ctx context.Context, query string, opts types.SearchOptions) ([]types.PackageRef, error) {
-	helper := types.NewProgressHelper(opts.Progress)
+	helper := types.NewProgressHelper(b.progress, opts.Progress)
 	helper.BeginAction("Search")
 	defer helper.EndAction()
 
@@ -311,7 +311,7 @@ func (b *Backend) ListInstalled(ctx context.Context, opts types.ListOptions) ([]
 		return nil, types.ErrNotSupported
 	}
 
-	helper := types.NewProgressHelper(opts.Progress)
+	helper := types.NewProgressHelper(b.progress, opts.Progress)
 	helper.BeginAction("ListInstalled")
 	defer helper.EndAction()
 
